@@ -10,6 +10,7 @@ This module provisions a complete customer team project with workspace, team, an
 - Grants the team maintain access on the project
 - Generates an ephemeral team token
 - Stores the token as `TFE_TOKEN` environment variable in the workspace
+- Passes `project_id` and `repo_identifier` as workspace variables
 
 ## Usage
 
@@ -17,10 +18,10 @@ This module provisions a complete customer team project with workspace, team, an
 module "customer_project" {
   source = "./modules/customer_project"
 
-  terraform_organization     = "my-org"
-  project_name               = "AWS Team Project"
-  repository_identifier      = "owner/aws-team-repo"
-  oauth_token_id = "ot-xxxxx"
+  terraform_organization = "my-org"
+  project_name           = "AWS Team Project"
+  repo_identifier        = "owner/aws-team-repo"
+  oauth_token_id         = "ot-xxxxx"
 }
 ```
 
@@ -37,7 +38,7 @@ module "customer_project" {
 |------|-------------|------|---------|----------|
 | `terraform_organization` | HCP Terraform organization name | `string` | n/a | yes |
 | `project_name` | Project name (used as prefix for workspace and team) | `string` | n/a | yes |
-| `repository_identifier` | VCS repository identifier (owner/repo) | `string` | n/a | yes |
+| `repo_identifier` | VCS repository identifier (owner/repo) | `string` | n/a | yes |
 | `oauth_token_id` | OAuth Token ID for VCS integration | `string` | `null` | no |
 
 ## Outputs
@@ -53,22 +54,31 @@ module "customer_project" {
 | Resource | Name Pattern |
 |----------|--------------|
 | `tfe_project.this` | `{project_name}` |
-| `tfe_workspace.manager` | `{project_name} Manager` |
+| `tfe_workspace.manager` | `{project_name}-manager` (lowercase, hyphenated) |
 | `tfe_team.workspace_manager` | `{project_name} Workspace Manager` |
 | `tfe_team_project_access.workspace_manager` | Maintain access on project |
 | `ephemeral.tfe_team_token.workspace_manager` | Team token (not stored in state) |
 | `tfe_variable.tfe_token` | `TFE_TOKEN` env var in workspace |
+| `tfe_variable.project_id` | Project ID for downstream workspaces |
+| `tfe_variable.repo_identifier` | Repo identifier for downstream workspaces |
 
 ## Workspace Configuration
 
 The manager workspace is configured with:
-- **Working Directory:** `terraform/workspaces`
-- **Trigger Patterns:** `terraform/workspaces/**/*`
+- **Working Directory:** `3_customer_project_code/terraform/workspaces`
+- **Trigger Patterns:** `3_customer_project_code/terraform/workspaces/**/*`
 - **VCS:** Connected when `oauth_token_id` is provided
+
+## Workspace Variables
+
+The manager workspace is provisioned with the following variables to enable it to create downstream workspaces:
+
+| Variable | Category | Description |
+|----------|----------|-------------|
+| `TFE_TOKEN` | env | Team token for API authentication (sensitive) |
+| `project_id` | terraform | ID of the project for creating workspaces |
+| `repo_identifier` | terraform | Repository identifier for VCS connections |
 
 ## Team Access
 
-The workspace manager team receives `maintain` access on the project with:
-- Project settings: read
-- Project teams: none
-- Full workspace management capabilities
+The workspace manager team receives `maintain` access on the project, enabling full workspace management capabilities.

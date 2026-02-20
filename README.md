@@ -8,9 +8,13 @@ The repository is structured as a multi-stage pipeline where each stage manages 
 
 ```
 hcp-organization-management/
-├── 0_bootstrap/              # Initial setup (run locally with user token)
-├── 1_organization_management/ # Core org resources (managed by workspace)
-└── 2_customer_projects/      # Customer project provisioning (managed by workspace)
+├── 0_bootstrap/                    # Initial setup (run locally with user token)
+├── 1_organization_management/      # Core org resources (managed by workspace)
+├── 2_customer_projects/            # Customer project provisioning (managed by workspace)
+└── 3_customer_project_code/        # Example customer project code
+    └── terraform/
+        ├── workspaces/             # Workspace definitions for customer infrastructure
+        └── infrastructure/         # Actual infrastructure code (e.g., AWS resources)
 ```
 
 ## Workflow
@@ -32,12 +36,19 @@ Managed automatically by the `{org}-administration` workspace:
 Managed automatically by the `{org}-customer-projects` workspace:
 - Uses reusable modules to provision customer team projects
 - Creates projects, workspaces, teams, and access controls
+- Each project gets a manager workspace that manages its own workspaces
+
+### Stage 3: Customer Project Code
+Example implementation of a customer project:
+- `terraform/workspaces/` - Defines workspaces for infrastructure with AWS OIDC authentication
+- `terraform/infrastructure/` - Contains actual infrastructure code (S3 buckets, etc.)
 
 ## Prerequisites
 
 - HCP Terraform organization
 - VCS OAuth connection configured in HCP Terraform
 - Terraform CLI >= 1.7
+- AWS account with OIDC trust relationship (for customer projects)
 
 ## Getting Started
 

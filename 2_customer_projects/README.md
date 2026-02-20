@@ -17,10 +17,10 @@ Customer projects are created using the `customer_project` module:
 module "aws_team_project_1" {
   source = "./modules/customer_project"
 
-  terraform_organization     = var.terraform_organization
-  project_name               = "AWS Team Project 1"
-  repository_identifier      = "owner/aws-team-project-1"
-  oauth_token_id = var.oauth_token_id
+  terraform_organization = var.terraform_organization
+  project_name           = "AWS Team Project 1"
+  repo_identifier        = "owner/hcp-organization-management"
+  oauth_token_id         = var.oauth_token_id
 }
 ```
 
@@ -31,10 +31,10 @@ module "aws_team_project_1" {
    module "new_project" {
      source = "./modules/customer_project"
 
-     terraform_organization     = var.terraform_organization
-     project_name               = "New Project Name"
-     repository_identifier      = "owner/new-project-repo"
-     oauth_token_id = var.oauth_token_id
+     terraform_organization = var.terraform_organization
+     project_name           = "New Project Name"
+     repo_identifier        = "owner/new-project-repo"
+     oauth_token_id         = var.oauth_token_id
    }
    ```
 
@@ -47,10 +47,13 @@ For each customer project, the module provisions:
 | Resource | Naming Convention |
 |----------|-------------------|
 | Project | `{project_name}` |
-| Workspace | `{project_name} Manager` |
+| Manager Workspace | `{project_name}-manager` (lowercase, hyphenated) |
 | Team | `{project_name} Workspace Manager` |
 | Team Access | Maintain access on project |
 | Team Token | Ephemeral, stored as `TFE_TOKEN` in workspace |
+| Workspace Variables | `project_id`, `repo_identifier` |
+
+The manager workspace is configured to manage `3_customer_project_code/terraform/workspaces/`, allowing each customer project to define its own infrastructure workspaces.
 
 ## Trigger Configuration
 
@@ -64,7 +67,6 @@ This workspace is configured with:
 |------|------|----------|-------------|
 | `terraform_organization` | string | yes | HCP Terraform organization name |
 | `oauth_token_id` | string | yes | OAuth Token ID for VCS integration |
-| `management_repo_identifier` | string | yes | Repository identifier |
 
 ## Outputs
 
