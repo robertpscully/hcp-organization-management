@@ -37,7 +37,5 @@ resource "tfe_variable" "hashitalks_tag" {
   value        = ""
   category     = "terraform"
   description  = "The hashitalks tag to use for this workspace"
-  lifecycle {
-    ignore_changes = [value]
-  }
+
 }
