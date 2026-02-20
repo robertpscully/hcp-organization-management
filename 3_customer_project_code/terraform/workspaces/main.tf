@@ -34,7 +34,7 @@ resource "tfe_variable" "enable_aws_run_role_arn" {
 resource "tfe_variable" "hashitalks_tag" {
   workspace_id = tfe_workspace.infrastructure.id
   key          = "hashitalks_tag"
-  value        = ""
+  value        = "let-it-please-the-demo-gods"
   category     = "terraform"
   description  = "The hashitalks tag to use for this workspace"
 
